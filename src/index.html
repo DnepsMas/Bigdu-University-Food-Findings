@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>今天吃什么｜大邮食堂志</title>
   <meta name="description" content="用《大邮食堂志》菜单数据，朴素地决定今天吃什么。">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./styles.css?v=1.2.2">
 </head>
 <body>
   <header class="site-header">
@@ -98,13 +98,13 @@
           <div class="section-head section-head-row">
             <div>
               <p class="eyebrow">像问同学一样问</p>
-              <h2 id="ask-title">AI 问答：决定今天吃什么</h2>
+              <h2 id="ask-title">问问今天吃什么</h2>
             </div>
-            <p class="plain-note">本页不联网，也不调用接口。它只是按你写的话，从菜单里做一次朴素匹配。</p>
+            <p class="plain-note">本页不联网，也不调用接口。它会尽量按你写的话，从菜单里找出能吃的一顿。</p>
           </div>
           <label class="field question-field">
             <span>我今天想……</span>
-            <textarea id="question" rows="3" placeholder="例：我在沙河，想吃点辣的，别超过 15 元"></textarea>
+            <textarea id="question" rows="3" placeholder="例：沙河，辣一点，15 元以内；或者直接写黄焖鸡"></textarea>
           </label>
           <div class="button-row compact-row">
             <button id="askButton" type="button">给我三个选项</button>
@@ -171,6 +171,6 @@
     <p>数据来自仓库中的《大邮食堂志》v1.1 表格。价格和供应以食堂现场为准。</p>
   </footer>
 
-  <script type="module" src="./app.js"></script>
+  <script type="module" src="./app.js?v=1.2.2"></script>
 </body>
 </html>

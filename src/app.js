@@ -1,4 +1,4 @@
-import { foodData } from './data/food-data.js';
+import { foodData } from './data/food-data.js?v=cleaned-2219';
 
 const ITEMS_PER_PAGE = 24;
 const GROUPS_PER_PAGE = 6;
@@ -214,7 +214,7 @@ function updatePager(page, totalPages) {
 function answerQuestion() {
   const text = elements.question.value.trim();
   const parsed = parseQuestion(text);
-  const candidates = getFilteredFoods(parsed);
+  const candidates = getQuestionCandidates(parsed);
   const picks = shuffle(candidates).slice(0, 3);
 
   if (!text) {
@@ -223,13 +223,65 @@ function answerQuestion() {
   }
 
   if (!picks.length) {
-    elements.answer.innerHTML = '<div class="empty">这句话筛得太窄了。可以去掉价格、校区或口味里的一个条件。</div>';
+    elements.answer.innerHTML = '<div class="empty">暂时没找到能吃的一顿。换个更常见的词，比如“饭”“面”“辣”“奶茶”。</div>';
     return;
   }
 
   const note = buildAnswerNote(parsed, candidates.length);
   elements.answer.innerHTML = `<p class="plain-note">${escapeHtml(note)}</p>${picks.map(renderFoodCard).join('')}`;
   updateTicket(picks[0]);
+}
+
+function getQuestionCandidates(parsed) {
+  const attempts = [
+    () => getFilteredFoods(parsed),
+    () => filterQuestionFoods(parsed, { fuzzyKeyword: true }),
+    () => filterQuestionFoods(parsed, { fuzzyKeyword: true, ignoreKeyword: true }),
+    () => filterQuestionFoods(parsed, { fuzzyKeyword: true, ignoreKeyword: true, ignoreBudget: true }),
+    () => filterQuestionFoods(parsed, { fuzzyKeyword: true, ignoreKeyword: true, ignoreBudget: true, ignorePreference: true }),
+    () => foods
+  ];
+
+  for (const attempt of attempts) {
+    const result = attempt();
+    if (result.length) return result;
+  }
+  return [];
+}
+
+function filterQuestionFoods(parsed, options = {}) {
+  const campus = parsed.campus;
+  const budget = options.ignoreBudget ? 999 : Number(parsed.budget || elements.budget.value || 999);
+  const preference = options.ignorePreference ? 'all' : (parsed.preference || elements.preference.value || 'all');
+  const rule = preferenceRules[preference] || preferenceRules.all;
+  const keyword = options.ignoreKeyword ? '' : normalize(parsed.keyword || '');
+
+  return foods.filter((food) => {
+    if (campus && food.campus !== campus) return false;
+    if (Number(food.price) > budget) return false;
+    if (!rule(food)) return false;
+    if (keyword && !matchesKeyword(food, keyword, options.fuzzyKeyword)) return false;
+    return true;
+  });
+}
+
+function matchesKeyword(food, keyword, fuzzy) {
+  const text = normalize(foodText(food));
+  if (!keyword || text.includes(keyword)) return true;
+  if (!fuzzy) return false;
+  return keywordTerms(keyword).some((term) => text.includes(term));
+}
+
+function keywordTerms(keyword) {
+  const value = normalize(keyword);
+  const terms = new Set();
+  for (let size = Math.min(4, value.length); size >= 2; size -= 1) {
+    for (let index = 0; index <= value.length - size; index += 1) {
+      terms.add(value.slice(index, index + size));
+    }
+  }
+  if (!terms.size && value) terms.add(value);
+  return [...terms];
 }
 
 function clearQuestion() {
@@ -266,7 +318,7 @@ function parseQuestion(text) {
 }
 
 function extractKeyword(text) {
-  const stopWords = ['我', '今天', '想', '吃', '喝', '一点', '点', '在', '校区', '以内', '以下', '别超过', '不要超过', '元', '块', '的', '给我', '推荐'];
+  const stopWords = ['我', '今天', '想', '吃', '喝', '一点', '点', '在', '校区', '以内', '以下', '别超过', '不要超过', '元', '块', '的', '给我', '推荐', '沙河', '本部', '西土城', '西土城路', '辣一点', '辣的', '麻辣', '清淡', '便宜', '贵', '不贵', '随便', '都行'];
   let result = text;
   for (const word of stopWords) {
     result = result.replaceAll(word, ' ');
@@ -377,7 +429,9 @@ function formatPrice(price) {
 }
 
 function randomItem(list) {
-  return list[Math.floor(Math.random() * list.length)];
+  const safeList = list.filter((food) => Number(food.price) > 0);
+  const pool = safeList.length ? safeList : list;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function shuffle(list) {
