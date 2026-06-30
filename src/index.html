@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>今天吃什么｜大邮食堂志</title>
+  <meta name="description" content="用《大邮食堂志》菜单数据，朴素地决定今天吃什么。">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="回到顶部">
+      <span class="brand-mark">BUFF</span>
+      <span>今天吃什么</span>
+    </a>
+    <nav class="site-nav" aria-label="页面导航">
+      <a href="#controls">条件</a>
+      <a href="#ask">问答</a>
+      <a href="#draw">抽签</a>
+      <a href="#list">菜单</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <p class="eyebrow">《大邮食堂志》v1.1 菜单数据</p>
+        <h1 id="hero-title">别想太久，先把范围圈小。</h1>
+        <p class="hero-copy">选校区、说口味、点一下抽签。这里不卖玄学，只从表格里挑出几样今天能考虑的饭。</p>
+      </div>
+      <div class="hero-ticket" aria-label="今日饭票">
+        <span>今日饭票</span>
+        <strong id="ticketText">待抽</strong>
+      </div>
+    </section>
+
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="筛选和数据概览">
+        <section id="controls" class="panel controls mobile-page" aria-labelledby="controls-title">
+          <div class="section-head">
+            <p class="eyebrow">先定条件</p>
+            <h2 id="controls-title">你在哪里，想吃什么</h2>
+          </div>
+
+          <form id="decisionForm" class="decision-form">
+            <fieldset>
+              <legend>校区</legend>
+              <label><input type="radio" name="campus" value="all" checked> 都行</label>
+              <label><input type="radio" name="campus" value="沙河校区"> 沙河</label>
+              <label><input type="radio" name="campus" value="西土城路校区"> 本部</label>
+            </fieldset>
+
+            <label class="field">
+              <span>偏好</span>
+              <select id="preference">
+                <option value="all">不挑</option>
+                <option value="full">吃饱点</option>
+                <option value="spicy">想吃辣</option>
+                <option value="light">清淡点</option>
+                <option value="noodle">面 / 粉</option>
+                <option value="rice">米饭 / 盖饭</option>
+                <option value="snack">小吃</option>
+                <option value="drink">喝点东西</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>预算</span>
+              <select id="budget">
+                <option value="999">不限</option>
+                <option value="10">10 元以内</option>
+                <option value="15" selected>15 元以内</option>
+                <option value="20">20 元以内</option>
+                <option value="35">35 元以内</option>
+              </select>
+            </label>
+
+            <label class="field search-field">
+              <span>想搜的字</span>
+              <input id="keyword" type="search" placeholder="例如：麻辣烫、奶茶、黄焖鸡">
+            </label>
+          </form>
+          <div class="mobile-quick-actions" aria-label="手机快捷操作">
+            <a class="mobile-action" href="#ask">去问答</a>
+            <a class="mobile-action ghost-action" href="#draw">去抽签</a>
+          </div>
+        </section>
+
+        <section id="stats" class="stats mobile-page" aria-label="数据概览">
+          <div><strong id="itemCount">0</strong><span>道菜品</span></div>
+          <div><strong id="shopCount">0</strong><span>个窗口</span></div>
+          <div><strong id="matchCount">0</strong><span>当前可选</span></div>
+        </section>
+      </aside>
+
+      <div class="main-column">
+        <section id="ask" class="panel ask-panel mobile-page" aria-labelledby="ask-title">
+          <div class="section-head section-head-row">
+            <div>
+              <p class="eyebrow">像问同学一样问</p>
+              <h2 id="ask-title">AI 问答：决定今天吃什么</h2>
+            </div>
+            <p class="plain-note">本页不联网，也不调用接口。它只是按你写的话，从菜单里做一次朴素匹配。</p>
+          </div>
+          <label class="field question-field">
+            <span>我今天想……</span>
+            <textarea id="question" rows="3" placeholder="例：我在沙河，想吃点辣的，别超过 15 元"></textarea>
+          </label>
+          <div class="button-row compact-row">
+            <button id="askButton" type="button">给我三个选项</button>
+            <button class="ghost" id="clearButton" type="button">重新来</button>
+          </div>
+          <div id="answer" class="answer" aria-live="polite"></div>
+        </section>
+
+        <section id="draw" class="panel draw-panel mobile-page" aria-labelledby="draw-title">
+          <div class="section-head section-head-row">
+            <div>
+              <p class="eyebrow">不想选就抽</p>
+              <h2 id="draw-title">今天吃什么抽签</h2>
+            </div>
+            <div class="button-row compact-row draw-actions">
+              <button id="drawButton" type="button">开始抽签</button>
+              <button class="ghost" id="surpriseButton" type="button">完全随机</button>
+            </div>
+          </div>
+          <div class="draw-card" id="drawCard">
+            <span class="draw-shop">点击按钮</span>
+            <strong>抽一张饭票</strong>
+            <span class="draw-meta">按当前条件来</span>
+          </div>
+        </section>
+
+        <section id="list" class="panel list-panel mobile-page" aria-labelledby="list-title">
+          <div class="section-head section-head-row">
+            <div>
+              <p class="eyebrow">先看看候选</p>
+              <h2 id="list-title">当前条件下的菜单</h2>
+            </div>
+            <div class="menu-tools" aria-label="菜单显示方式">
+              <div class="segmented" role="group" aria-label="菜单分组">
+                <button class="chip is-active" type="button" data-view="category">按分类</button>
+                <button class="chip" type="button" data-view="shop">按窗口</button>
+                <button class="chip" type="button" data-view="plain">平铺</button>
+              </div>
+              <label class="field sort-field">
+                <span>排序</span>
+                <select id="sortMode">
+                  <option value="shuffle">随便看看</option>
+                  <option value="priceAsc">价格低到高</option>
+                  <option value="priceDesc">价格高到低</option>
+                  <option value="name">菜名</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="menu-summary" id="menuSummary">正在整理菜单……</div>
+          <div id="foodList" class="food-list grouped-list" aria-live="polite"></div>
+          <div class="pager" aria-label="菜单分页">
+            <button class="ghost" id="prevPage" type="button">上一页</button>
+            <span id="pageInfo">第 1 页</span>
+            <button class="ghost" id="nextPage" type="button">下一页</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>数据来自仓库中的《大邮食堂志》v1.1 表格。价格和供应以食堂现场为准。</p>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
