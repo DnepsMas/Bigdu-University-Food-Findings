@@ -1,3 +1,13 @@
+# Prologue
+
+- A: 中午/今晚吃什么?
+- B: 是啊, 吃什么?
+- C: 是啊, 吃什么?
+- D: 是啊, 吃什么?
+- ......
+
+不知道吃什么, 就来看看《大邮食堂志》（*Bigdu University Food Findings*）吧!
+
 # BUFF Archive
 
 这里是《大邮食堂志》（*Bigdu[^1] University Food Findings*）的归档仓库。
